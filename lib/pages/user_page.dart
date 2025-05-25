@@ -1,5 +1,7 @@
 import 'package:chat/models/user.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class UserPage extends StatefulWidget {
@@ -13,26 +15,31 @@ class _UserPageState extends State<UserPage> {
   RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   final users = [
-    User(online: true, email: 'test1@test', name: 'Brenda', uid: '1'),
-    User(online: true, email: 'test2@test', name: 'Carolina', uid: '2'),
-    User(online: false, email: 'test3@test', name: 'Osorio', uid: '3'),
-    User(online: true, email: 'test4@test', name: 'Gonzalez', uid: '4'),
+    Usuario(online: true, email: 'test1@test', nombre: 'Brenda', uid: '1'),
+    Usuario(online: true, email: 'test2@test', nombre: 'Carolina', uid: '2'),
+    Usuario(online: false, email: 'test3@test', nombre: 'Osorio', uid: '3'),
+    Usuario(online: true, email: 'test4@test', nombre: 'Gonzalez', uid: '4'),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final usuario = authService.usuario;
     return Scaffold(
       appBar: AppBar(
-          title: Text('Mi Nombre', style: TextStyle(color: Colors.black54)),
+          title: Text(usuario.nombre, style: TextStyle(color: Colors.black54)),
           elevation: 1,
           backgroundColor: Colors.white,
           leading: IconButton(
-            icon: Icon(Icons.exit_to_app, color: Colors.black54),
-            onPressed: () {},
+            icon: const Icon(Icons.exit_to_app, color: Colors.black54),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, 'login');
+              AuthService.deleteToken();
+            },
           ),
           actions: [
             Container(
-                margin: EdgeInsets.only(right: 10),
+                margin: const EdgeInsets.only(right: 10),
                 child: Icon(
                   Icons.check_circle,
                   color: Colors.blue[400],
@@ -55,18 +62,18 @@ class _UserPageState extends State<UserPage> {
 
   ListView _listViewUsers() {
     return ListView.separated(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (_, i) => _userListTile(users[i]),
-        separatorBuilder: (_, i) => Divider(),
+        separatorBuilder: (_, i) => const Divider(),
         itemCount: users.length);
   }
 
-  ListTile _userListTile(User user) {
+  ListTile _userListTile(Usuario user) {
     return ListTile(
-        title: Text(user.name),
+        title: Text(user.nombre),
         subtitle: Text(user.email),
         leading: CircleAvatar(
-          child: Text(user.name.substring(0, 2)),
+          child: Text(user.nombre.substring(0, 2)),
           backgroundColor: Colors.blue[100],
         ),
         trailing: Container(
@@ -79,7 +86,7 @@ class _UserPageState extends State<UserPage> {
   }
 
   _loadUsers() async {
-    await Future.delayed(Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 1000));
     _refreshController.refreshCompleted();
   }
 }

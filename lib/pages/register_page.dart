@@ -1,8 +1,11 @@
+import 'package:chat/helpers/mostrar_alerta.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/widgets/blue_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -53,6 +56,8 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -79,10 +84,21 @@ class _FormState extends State<_Form> {
             keyboardType: TextInputType.emailAddress,
             isPassword: true,
           ),
-          BlueButton(onPressed: () {
-            print(emailController.text);
-            print(passwordController.text);
-          }),
+          BlueButton(
+              text: 'Crear cuenta',
+              onPressed: authService.autenticando
+                  ? () => {}
+                  : () async {
+                      FocusScope.of(context).unfocus();
+                      final registerOk = await authService.register(nameController.text.trim(),
+                          emailController.text.trim(), passwordController.text.trim());
+                      if (registerOk == true) {
+                        Navigator.pushReplacementNamed(context, 'usuarios');
+                      } else {
+                        //Mostrar alerta
+                        mostrarAlerta(context, 'Login incorrecto', registerOk);
+                      }
+                    }),
         ],
       ),
     );

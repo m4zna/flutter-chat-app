@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class BlueButton extends StatelessWidget {
+  final String text;
   final Function onPressed;
 
-  const BlueButton({super.key, required this.onPressed});
+  const BlueButton({super.key,required this.text,  required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -13,13 +14,13 @@ class BlueButton extends StatelessWidget {
           backgroundColor: Colors.blue,
           shape: const StadiumBorder(),
         ),
-        onPressed: onPressed(),
-        child: const SizedBox(
+        onPressed:() => onPressed(),
+        child:  SizedBox(
           width: double.infinity,
           height: 55,
           child: Center(
               child: Text(
-            'Ingresar',
+            text,
             style: TextStyle(color: Colors.white, fontSize: 20),
           )),
         ));
