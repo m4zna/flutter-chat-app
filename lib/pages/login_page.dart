@@ -1,5 +1,6 @@
 import 'package:chat/helpers/mostrar_alerta.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/blue_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/labels.dart';
@@ -50,6 +51,7 @@ class _FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
+    final socketService = Provider.of<SocketService>(context, listen: false);
 
     return Container(
       margin: const EdgeInsets.only(top: 40),
@@ -72,13 +74,13 @@ class _FormState extends State<_Form> {
           ),
           BlueButton(
               text: 'Ingrese',
-              onPressed: authService.autenticando
-                  ? () => {}
-                  : () async {
+              onPressed:  () async {
                       FocusScope.of(context).unfocus();
                       final loginOk = await authService.login(
                           emailController.text.trim(), passwordController.text.trim());
+                   print('loginOk' + loginOk.toString());
                       if (loginOk) {
+                        socketService.connect();
                         Navigator.pushReplacementNamed(context, 'usuarios');
                       } else {
                         //Mostrar alerta

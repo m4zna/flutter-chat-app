@@ -12,26 +12,26 @@ String usuarioToJson(Usuario data) => json.encode(data.toJson());
 class Usuario {
   Usuario({
     required this.online,
-    required this.nombre,
+    required this.name,
     required this.email,
     required this.uid,
   });
 
   bool online;
-  String nombre;
+  String name;
   String email;
   String uid;
 
   factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
     online: json["online"],
-    nombre: json["nombre"],
+    name: json["name"]??'',
     email: json["email"],
     uid: json["uid"],
   );
 
   Map<String, dynamic> toJson() => {
     "online": online,
-    "nombre": nombre,
+    "name": name,
     "email": email,
     "uid": uid,
   };

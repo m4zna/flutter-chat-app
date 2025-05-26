@@ -33,6 +33,7 @@ class AuthService with ChangeNotifier {
   Future<bool> login(String email, String password) async {
     autenticando = true;
     final data = {'email': email, 'password': password};
+    print(data);
     final resp = await http.post(Uri.parse('${Environment.apiUrl}/login'),
         body: jsonEncode(data), headers: {'Content-Type': 'application/json'});
 
@@ -50,7 +51,9 @@ class AuthService with ChangeNotifier {
 
   Future register(String name, String email, String password) async {
     autenticando = true;
-    final data = {'nombre': name, 'email': email, 'password': password};
+
+    final data = {'name': name, 'email': email, 'password': password};
+
     final resp = await http.post(Uri.parse('${Environment.apiUrl}/login/new'),
         body: jsonEncode(data), headers: {'Content-Type': 'application/json'});
 
@@ -68,15 +71,19 @@ class AuthService with ChangeNotifier {
   }
 
   Future<bool> isLoggedIn() async {
-    final token = await _storage.read(key: 'token');
-    print('token: $token');
 
-    final resp = await http.get(Uri.parse('${Environment.apiUrl}/login/renew'),
-        headers: {'Content-Type': 'application/json', 'x-token': token!});
+    final token = await _storage.read(key: 'token') ?? '';
 
-    print(resp.body);
-    if (resp.statusCode == 200) {
-      final loginResponse = loginResponseFromJson(resp.body);
+    final uri = Uri.parse('${ Environment.apiUrl }/login/renew');
+    final resp = await http.get(uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': token
+        }
+    );
+
+    if ( resp.statusCode == 200 ) {
+      final loginResponse = loginResponseFromJson( resp.body );
       usuario = loginResponse.usuario;
       await _guardarToken(loginResponse.token);
       return true;
@@ -84,7 +91,9 @@ class AuthService with ChangeNotifier {
       logout();
       return false;
     }
+
   }
+
 
   Future _guardarToken(String token) async {
     return await _storage.write(key: 'token', value: token);
